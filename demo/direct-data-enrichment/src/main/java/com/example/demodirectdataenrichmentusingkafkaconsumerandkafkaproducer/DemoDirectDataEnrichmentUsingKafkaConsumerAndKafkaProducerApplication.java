@@ -55,6 +55,6 @@ public class DemoDirectDataEnrichmentUsingKafkaConsumerAndKafkaProducerApplicati
         String recordJsonValue = gson.toJson(directlyEnrichedMessage);
 
         //Produce enriched message
-        _template.send("enriched_using_direct_kafka_consumer_and_kafka_producer", recordJsonValue);
+        _template.send("enriched-using-direct-kafka-consumer-and-kafka-producer", recordJsonValue);
     }
 }

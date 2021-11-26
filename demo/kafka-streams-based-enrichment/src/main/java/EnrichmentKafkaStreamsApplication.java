@@ -1,14 +1,10 @@
-import com.google.gson.internal.Streams;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.*;
-import org.apache.kafka.streams.kstream.ForeachAction;
 import org.apache.kafka.streams.kstream.JoinWindows;
 import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.KTable;
 
 import java.time.Duration;
 import java.util.Properties;
-import java.util.UUID;
 
 public class EnrichmentKafkaStreamsApplication {
     public static void main(final String[] args) {
