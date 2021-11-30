@@ -27,8 +27,6 @@ public class DemoRawDataKafkaProducerApplication {
 
     @Scheduled(fixedRate=1000)
     private void scheduledMessageProducer() throws ParseException {
-        System.out.println("scheduledMessageProducer -> Invoked");
-
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
 
         Gson gson = new Gson();

@@ -43,8 +43,6 @@ public class DemoDirectDataEnrichmentUsingKafkaConsumerAndKafkaProducerApplicati
 
     @KafkaListener(topics = "raw-data")
     public void enrichAndProduceEnrichedMessage(String message) {
-        System.out.println("enrichAndProduceEnrichedMessage -> Invoked");
-
         //Read enrichment data from Redis
         RAtomicLong atomicLong = redisson.getAtomicLong("tokenId");
 

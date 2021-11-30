@@ -18,10 +18,8 @@ public class EnrichmentKafkaStreamsApplication {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
 
         KStream<String, String> rawDataStream = streamsBuilder.stream("raw-data");
-        rawDataStream.foreach((key, value) -> System.out.println("[" + key + "," + value + "]"));
 
         KStream<String, String> rawEnrichmentDataStream = streamsBuilder.stream("raw-redis-enrichment-data");
-        rawEnrichmentDataStream.foreach((key, value) -> System.out.println("[" + key + "," + value + "]"));
 
         KStream<String, String> enrichedRawData = rawDataStream.join(rawEnrichmentDataStream,
                 (readOnlyKey, rawDataValue, rawEnrichmentDataValue) -> rawDataValue + ":" + rawEnrichmentDataValue,

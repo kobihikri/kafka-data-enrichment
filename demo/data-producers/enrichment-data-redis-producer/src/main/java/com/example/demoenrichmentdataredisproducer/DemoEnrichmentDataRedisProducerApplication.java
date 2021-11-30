@@ -37,7 +37,6 @@ public class DemoEnrichmentDataRedisProducerApplication {
 
     @Scheduled(fixedRate=1000)
     private void scheduledEnrichmentProducer(){
-        System.out.println("scheduledEnrichmentProducer -> Invoked");
         RAtomicLong atomicLong = redisson.getAtomicLong("tokenId");
         atomicLong.set(atomicLong.get() + 1);
     }

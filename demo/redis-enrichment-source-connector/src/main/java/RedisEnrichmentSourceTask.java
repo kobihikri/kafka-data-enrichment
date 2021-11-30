@@ -52,7 +52,6 @@ public class RedisEnrichmentSourceTask extends SourceTask {
 
     @Override
     public List<SourceRecord> poll() throws InterruptedException {
-        System.out.println("RedisEnrichmentDataFetcherSourceTask -> poll -> invoked");
         List<SourceRecord> result = new ArrayList<>();
 
         RAtomicLong atomicLong = redisson.getAtomicLong("tokenId");

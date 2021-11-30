@@ -66,8 +66,6 @@ public class RedisEnrichmentDataFetcherKafkaSinkTask extends SinkTask {
 
     @Override
     public void put(Collection<SinkRecord> recordsToEnrichWithRedisData) {
-        System.out.println("RedisEnrichmentDataFetcherKafkaSinkTask -> put -> invoked");
-
         //DATA ENRICHMENT CODE
         //--------------------
         //Per each record we've read from kafka - we would like to activate our enrichment function and write the source
@@ -86,6 +84,13 @@ public class RedisEnrichmentDataFetcherKafkaSinkTask extends SinkTask {
             //Produce enriched message
             producer.send(new ProducerRecord<>(outputTopicName, recordJsonValue));
         });
+
+        //For Demo Sake
+        try{
+            Thread.sleep(1000);
+        } catch (Exception ex){
+            System.out.println("RedisEnrichmentDataFetcherKafkaSinkTask -> put -> thread sleep interupted"); 
+        }
     }
 
     @Override
