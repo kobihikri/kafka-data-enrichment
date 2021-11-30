@@ -4,8 +4,8 @@ services:
 
   zookeeper:
     build: 
-      context: ./apache-kafka/zookeeper
-      dockerfile: Dockerfile
+      context: ../../apache-kafka/zookeeper
+      dockerfile: ./Dockerfile
     ports: ["2181:2181"]
     environment:
       ZOOKEEPER_LOG_DIR: ./zookeeper_logDir
@@ -15,8 +15,8 @@ services:
 
   kafka:
     build:
-      context: ./apache-kafka/kafka
-      dockerfile: Dockerfile
+      context: ../../apache-kafka/kafka
+      dockerfile: ./Dockerfile
     environment: 
       JMX_PORT: 9999
       KAFKA_BROKER_ID: 1
@@ -51,26 +51,20 @@ services:
 
   demo-raw-data-kafka-producer:
     build:
-      context: ./demo/data-producers/raw-data-kafka-producer
-      dockerfile: Dockerfile
+      context: ../data-producers/raw-data-kafka-producer
+      dockerfile: ./Dockerfile
     restart: always
 
   demo-enrichment-data-redis-producer:
     build:
-      context: ./demo/data-producers/enrichment-data-redis-producer
-      dockerfile: Dockerfile
-    restart: always
-
-  demo-direct-data-enrichment-using-kafka-consumer-and-kafka-producer:
-    build:
-      context: ./demo/direct-data-enrichment
-      dockerfile: Dockerfile
+      context: ../data-producers/enrichment-data-redis-producer
+      dockerfile: ./Dockerfile
     restart: always
 
   kafka-connect:
     build:
-      context: ./apache-kafka/kafka-connect
-      dockerfile: Dockerfile
+      context: ../../apache-kafka/kafka-connect
+      dockerfile: ./Dockerfile
     ports: ["8083:8083"]
     environment:
       KAFKA_CONNECT_LOG_DIR: ./kafka_connect_logDir
@@ -84,19 +78,6 @@ services:
 
   demo-kafka-streams-based-enrichment:
     build:
-      context: ./demo/kafka-streams-based-enrichment
-      dockerfile: Dockerfile 
+      context: ../kafka-streams-based-enrichment
+      dockerfile: ./Dockerfile 
     restart: always
-
-  ksqldb-server:
-    image: confluentinc/ksqldb-server
-    ports: ["8088:8088"]
-    environment:
-      KSQL_BOOTSTRAP_SERVERS: kafka:9092
-      KSQL_LISTENERS: http://0.0.0.0:8088
-      KSQL_KSQL_SERVICE_ID: kafka-streams-enrichment-using-kafka-connect
-    restart: always
-
-  # Connect using ksqldb-cli. 
-  # e.g. docker run --rm --interactive --tty confluentinc/ksqldb-cli:latest ksql http://10.100.102.26:8088
-  

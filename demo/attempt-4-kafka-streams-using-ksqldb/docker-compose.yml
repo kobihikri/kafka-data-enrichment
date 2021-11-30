@@ -1,0 +1,89 @@
+version: '3.9'
+
+services:
+
+  zookeeper:
+    build: 
+      context: ../../apache-kafka/zookeeper
+      dockerfile: ./Dockerfile
+    ports: ["2181:2181"]
+    environment:
+      ZOOKEEPER_LOG_DIR: ./zookeeper_logDir
+      ZOOKEEPER_DATA_DIR: ./zookeeper_dataDir
+      ZOOKEEPER_PORT: 2181
+    restart: always
+
+  kafka:
+    build:
+      context: ../../apache-kafka/kafka
+      dockerfile: ./Dockerfile
+    environment: 
+      JMX_PORT: 9999
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG_DIR: ./kafka_logDir
+      KAFKA_DATA_DIR: ./kafka_dataDir
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_NUM_PARTITIONS: 2
+    restart: always
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    restart: "no"
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092"
+      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+
+  redis:
+    image: redis:alpine
+    ports: ["6379:6379"]
+    restart: always
+
+  redis-commander:
+    image: rediscommander/redis-commander
+    ports: ["8081:8081"]
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    restart: always
+
+  demo-raw-data-kafka-producer:
+    build:
+      context: ../data-producers/raw-data-kafka-producer
+      dockerfile: ./Dockerfile
+    restart: always
+
+  demo-enrichment-data-redis-producer:
+    build:
+      context: ../data-producers/enrichment-data-redis-producer
+      dockerfile: ./Dockerfile
+    restart: always
+
+  kafka-connect:
+    build:
+      context: ../../apache-kafka/kafka-connect
+      dockerfile: ./Dockerfile
+    ports: ["8083:8083"]
+    environment:
+      KAFKA_CONNECT_LOG_DIR: ./kafka_connect_logDir
+      KAFKA_CONNECT_DATA_DIR: ./kafka_connect_dataDir
+      KAFKA_CONNECT_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_CONNECT_GROUP_ID: connect-cluster
+      KAFKA_CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      KAFKA_CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      KAFKA_CONNECT_PLUGIN_PATH: bin/compiled-connectors
+    restart: always
+
+  ksqldb-server:
+    image: confluentinc/ksqldb-server
+    ports: ["8088:8088"]
+    environment:
+      KSQL_BOOTSTRAP_SERVERS: kafka:9092
+      KSQL_LISTENERS: http://0.0.0.0:8088
+      KSQL_KSQL_SERVICE_ID: kafka-streams-enrichment-using-kafka-connect
+    restart: always
+
+  # Connect using ksqldb-cli. 
+  # e.g. docker run --rm --interactive --tty confluentinc/ksqldb-cli:latest ksql http://10.100.102.26:8088
