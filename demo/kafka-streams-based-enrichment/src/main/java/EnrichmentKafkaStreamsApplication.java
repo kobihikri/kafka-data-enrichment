@@ -24,7 +24,8 @@ public class EnrichmentKafkaStreamsApplication {
         KStream<String, String> enrichedRawData = rawDataStream.join(rawEnrichmentDataStream,
                 (readOnlyKey, rawDataValue, rawEnrichmentDataValue) -> rawDataValue + ":" + rawEnrichmentDataValue,
                 JoinWindows.of(Duration.ofMinutes(1)));
-        enrichedRawData.foreach((key, value) -> System.out.println("[" + key + "," + value + "]"));
+        
+        enrichedRawData.to("enriched-using-kafka-streams");
 
         Topology topology = streamsBuilder.build();
         KafkaStreams streams = new KafkaStreams(topology, props);
