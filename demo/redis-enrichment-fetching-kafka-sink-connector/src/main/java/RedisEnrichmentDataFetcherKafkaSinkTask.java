@@ -84,13 +84,6 @@ public class RedisEnrichmentDataFetcherKafkaSinkTask extends SinkTask {
             //Produce enriched message
             producer.send(new ProducerRecord<>(outputTopicName, recordJsonValue));
         });
-
-        //For Demo Sake
-        try{
-            Thread.sleep(1000);
-        } catch (Exception ex){
-            System.out.println("RedisEnrichmentDataFetcherKafkaSinkTask -> put -> thread sleep interupted"); 
-        }
     }
 
     @Override
