@@ -1,5 +1,5 @@
 FROM openjdk:jre-alpine
-ARG kafka_version=3.0.0
+ARG kafka_version=3.1.0
 ARG kafka_filename=kafka_2.13-${kafka_version}
 RUN apk update && apk add wget bash dos2unix && rm -rf /var/cache/apk/*
 RUN wget https://downloads.apache.org/kafka/${kafka_version}/${kafka_filename}.tgz
