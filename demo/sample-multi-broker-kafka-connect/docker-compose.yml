@@ -1,0 +1,83 @@
+version: '3.9'
+
+services:
+
+  zookeeper:
+    build: 
+      context: ../../apache-kafka/zookeeper
+      dockerfile: ./Dockerfile
+    ports: ["2181:2181"]
+    environment:
+      ZOOKEEPER_LOG_DIR: ./zookeeper_logDir
+      ZOOKEEPER_DATA_DIR: ./zookeeper_dataDir
+      ZOOKEEPER_PORT: 2181
+    restart: always
+
+  kafka:
+    build:
+      context: ../../apache-kafka/kafka
+      dockerfile: ./Dockerfile
+    environment: 
+      JMX_PORT: 9999
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG_DIR: ./kafka_logDir
+      KAFKA_DATA_DIR: ./kafka_dataDir
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_NUM_PARTITIONS: 2
+    restart: always
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    restart: "no"
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092"
+      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+
+  akhq:
+    image: tchiotludo/akhq
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            docker-kafka-server:
+              properties:
+                bootstrap.servers: "kafka:9092"
+              connect:
+                - name: "connect"
+                  url: "http://kafka-connect-1:8083"
+    ports:
+      - 8080:8080
+
+  kafka-connect-1:
+    build:
+      context: ../../apache-kafka/kafka-connect
+      dockerfile: ./Dockerfile
+    ports: ["8083:8083"]
+    environment:
+      KAFKA_CONNECT_LOG_DIR: ./kafka_connect_logDir
+      KAFKA_CONNECT_DATA_DIR: ./kafka_connect_dataDir
+      KAFKA_CONNECT_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_CONNECT_GROUP_ID: connect-cluster
+      KAFKA_CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      KAFKA_CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      KAFKA_CONNECT_PLUGIN_PATH: bin/compiled-connectors
+    restart: always
+  
+  kafka-connect-2:
+    build:
+      context: ../../apache-kafka/kafka-connect
+      dockerfile: ./Dockerfile
+    ports: ["8084:8083"]
+    environment:
+      KAFKA_CONNECT_LOG_DIR: ./kafka_connect_logDir
+      KAFKA_CONNECT_DATA_DIR: ./kafka_connect_dataDir
+      KAFKA_CONNECT_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_CONNECT_GROUP_ID: connect-cluster
+      KAFKA_CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      KAFKA_CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      KAFKA_CONNECT_PLUGIN_PATH: bin/compiled-connectors
+    restart: always
